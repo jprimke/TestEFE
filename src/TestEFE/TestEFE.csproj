@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.41" />
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.2.1" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="D:\PROJEKTE\Bestand\Importer\Tools\GenericImport\src\TestEFE\ImportsRunner.cs" company="AXA Partners">
+// <copyright file="D:\PROJEKTE\TestEFE\src\TestEFE\ImportsRunner.cs" company="AXA Partners">
 // Author: Jörg H Primke
 // Copyright (c) 2021 - AXA Partners. All rights reserved.
 // </copyright>
@@ -8,11 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Bogus;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -64,7 +62,7 @@ namespace TestEFE
             List<Policy> policies = new();
             long count = 0L, successful = 0L;
 
-            foreach (var policy in GeneratePolicies())
+            foreach (Policy policy in GeneratePolicies())
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -86,66 +84,98 @@ namespace TestEFE
         private IEnumerable<Policy> GeneratePolicies()
         {
             int productId = 341;
-            int schemeId = 377;
+            int schemeAutoId = 377;
+            int schemeTravelId = 413;
 
             string[] policyNumbers = new[] { "eins", "zwei", "drei", "vier", "fünf", "sechs" };
             int i = 0;
 
-            Faker<AutoPaket> testPakets = new Faker<AutoPaket>().RuleFor(p => p.Active, f => true)
-                                                                .RuleFor(p => p.Created, f => f.Date.Past(1))
-                                                                .RuleFor(p => p.CreatedBy, f => "AXA Partners")
-                                                                .RuleFor(p => p.ChangedBy, f => "AXA Partners")
-                                                                .RuleFor(p => p.LastChanged, f => DateTime.Now)
-                                                                .RuleFor(p => p.ValidFrom, f => f.Date.Past(0))
-                                                                .RuleFor(p => p.ValidTo, f => f.Date.Future(2))
-                                                                .RuleFor(p => p.Name, f => "TestPaket")
-                                                                .RuleFor(p => p.SchemeId, f => schemeId)
-                                                                .RuleFor(p => p.Brand, f => f.Vehicle.Manufacturer())
-                                                                .RuleFor(p => p.Model, f => f.Vehicle.Model())
-                                                                .RuleFor(p => p.Vin, f => f.Vehicle.Vin())
-                                                                .RuleFor(p => p.FirstRegistrationDate, f => f.Date.Past(2));
+            Faker<AutoPaket> testAutoPakets = new Faker<AutoPaket>().RuleFor(p => p.Active, f => true)
+                                                                    .RuleFor(p => p.Created, f => f.Date.Past(1))
+                                                                    .RuleFor(p => p.CreatedBy, f => "AXA Partners")
+                                                                    .RuleFor(p => p.ChangedBy, f => "AXA Partners")
+                                                                    .RuleFor(p => p.LastChanged, f => DateTime.Now)
+                                                                    .RuleFor(p => p.ValidFrom, f => f.Date.Past(0))
+                                                                    .RuleFor(p => p.ValidTo, f => f.Date.Future(2))
+                                                                    .RuleFor(p => p.Name, f => "TestPaket")
+                                                                    .RuleFor(p => p.SchemeId, f => schemeAutoId)
+                                                                    .RuleFor(p => p.Brand, f => f.Vehicle.Manufacturer())
+                                                                    .RuleFor(p => p.Model, f => f.Vehicle.Model())
+                                                                    .RuleFor(p => p.Vin, f => f.Vehicle.Vin())
+                                                                    .RuleFor(p => p.FirstRegistrationDate, f => f.Date.Past(2));
 
-            var testPolicies = new Faker<Policy>().RuleFor(p => p.PolicyNumber, f => policyNumbers[i++])
-                                   .RuleFor(
-                    p => p.Person,
-                    f =>
-                        new Models.Person
-                        {
-                            FirstName = f.Name.FirstName(),
-                            Name = f.Name.LastName()
-                        })
-                                   .RuleFor(
-                    p => p.Address,
-                    f =>
-                        new Address
-                        {
-                            City = f.Address.City(),
-                            CountryCode = f.Address.CountryCode(),
-                            Street = f.Address.StreetAddress(),
-                            Zip = f.Address.ZipCode()
-                        })
-                                   .RuleFor(
-                    p => p.Contact,
-                    (f, p) =>
-                        new Contact
-                        {
-                            Email = f.Internet.Email(p.Person.FirstName, p.Person.Name),
-                            Phone = f.Phone.PhoneNumber()
-                        })
-                                   .RuleFor(p => p.Created, f => f.Date.Past(1))
-                                   .RuleFor(p => p.CreatedBy, f => "AXA Partners")
-                                   .RuleFor(p => p.ChangedBy, f => "AXA Partners")
-                                   .RuleFor(p => p.LastChanged, f => DateTime.Now)
-                                   .RuleFor(p => p.Active, f => true)
-                                   .RuleFor(p => p.ProductName, f => "Testproduct")
-                                   .RuleFor(p => p.ProductId, f => productId)
-                                   .RuleFor(p => p.ValidFrom, f => f.Date.Past(0))
-                                   .RuleFor(p => p.ValidTo, f => f.Date.Future(2))
-                                   .RuleFor(p => p.Pakets, f => testPakets.Generate(1).Cast<Paket>().ToList());
+            Faker<TravelPaket> testTravelPakets = new Faker<TravelPaket>().RuleFor(p => p.Active, f => true)
+                                                                        .RuleFor(p => p.Created, f => f.Date.Past(1))
+                                                                        .RuleFor(p => p.CreatedBy, f => "AXA Partners")
+                                                                        .RuleFor(p => p.ChangedBy, f => "AXA Partners")
+                                                                        .RuleFor(p => p.LastChanged, f => DateTime.Now)
+                                                                        .RuleFor(p => p.ValidFrom, f => f.Date.Past(0))
+                                                                        .RuleFor(p => p.ValidTo, f => f.Date.Future(2))
+                                                                        .RuleFor(p => p.Name, f => "TravelPaket")
+                                                                        .RuleFor(p => p.SchemeId, f => schemeTravelId)
+                                                                        .RuleFor(p => p.Birthday, f => f.Date.Past(18))
+                                                                        .RuleFor(
+                                                    p => p.InsuredPerson,
+                                                    f =>
+                                                        new Models.Person
+                                                        {
+                                                            FirstName = f.Name.FirstName(),
+                                                            Name = f.Name.LastName()
+                                                        });
+;
+
+            Faker<Policy> testPolicies = new Faker<Policy>().RuleFor(p => p.PolicyNumber, f => policyNumbers[i++])
+                                                            .RuleFor(
+                                             p => p.Person,
+                                             f =>
+                                                 new Models.Person
+                                                 {
+                                                     FirstName = f.Name.FirstName(),
+                                                     Name = f.Name.LastName()
+                                                 })
+                                                            .RuleFor(
+                                             p => p.Address,
+                                             f =>
+                                                 new Address
+                                                 {
+                                                     City = f.Address.City(),
+                                                     CountryCode = f.Address.CountryCode(),
+                                                     Street = f.Address.StreetAddress(),
+                                                     Zip = f.Address.ZipCode()
+                                                 })
+                                                            .RuleFor(
+                                             p => p.Contact,
+                                             (f, p) =>
+                                                 new Contact
+                                                 {
+                                                     Email = f.Internet.Email(p.Person.FirstName, p.Person.Name),
+                                                     Phone = f.Phone.PhoneNumber()
+                                                 })
+                                                            .RuleFor(p => p.Created, f => f.Date.Past(1))
+                                                            .RuleFor(p => p.CreatedBy, f => "AXA Partners")
+                                                            .RuleFor(p => p.ChangedBy, f => "AXA Partners")
+                                                            .RuleFor(p => p.LastChanged, f => DateTime.Now)
+                                                            .RuleFor(p => p.Active, f => true)
+                                                            .RuleFor(p => p.ProductName, f => "Testproduct")
+                                                            .RuleFor(p => p.ProductId, f => productId)
+                                                            .RuleFor(p => p.ValidFrom, f => f.Date.Past(0))
+                                                            .RuleFor(p => p.ValidTo, f => f.Date.Future(2))
+                                                            .FinishWith(
+                                             (f, p) =>
+                                             {
+                                                 foreach (var item in testAutoPakets.Generate(1))
+                                                 {
+                                                     p.Pakets.Add(item);
+                                                 }
+                                                 foreach (var item in testTravelPakets.Generate(1))
+                                                 {
+                                                     p.Pakets.Add(item);
+                                                 }
+                                             });
 
             try
             {
-                var policies = testPolicies.Generate(5);
+                List<Policy> policies = testPolicies.Generate(5);
                 return policies!;
             }
             catch (Exception ex)
